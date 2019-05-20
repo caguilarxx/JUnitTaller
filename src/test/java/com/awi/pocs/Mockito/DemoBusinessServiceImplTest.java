@@ -1,5 +1,8 @@
 package com.awi.pocs.Mockito;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.notNullValue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
@@ -13,6 +16,8 @@ import com.awi.pocs.model.api.DemoRequest;
 import io.reactivex.Single;
 import io.reactivex.observers.TestObserver;
 import io.reactivex.subscribers.TestSubscriber;
+
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -50,6 +55,18 @@ public class DemoBusinessServiceImplTest {
     when(cardsApi.getCards(any())).thenReturn(buildCardApiData());
 
   }
+
+  @Test
+  public void testTilterActiveCardsAltWay() {
+
+    List<Card> cardsTmp = new ArrayList<>();
+
+    service.filterActiveCards(request).subscribe(cards -> cardsTmp.addAll(cards));
+
+    assertThat(cardsTmp, hasSize(3));
+    assertThat(cardsTmp, notNullValue());
+  }
+
 
   @Test
   public void testTilterActiveCards() {
