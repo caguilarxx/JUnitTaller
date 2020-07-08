@@ -28,9 +28,9 @@ public class Card {
   private List<Product> products;
 
 
-  public Card(int i, String s, boolean b) {
-    this.id = i;
-    this.number = s;
-    this.active = b;
+  public Card(int id, String number, boolean active) {
+    this.id = id;
+    this.number = number;
+    this.active = active;
   }
 }

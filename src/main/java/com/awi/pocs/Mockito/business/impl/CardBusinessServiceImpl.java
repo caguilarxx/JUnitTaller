@@ -33,7 +33,8 @@ public class CardBusinessServiceImpl implements CardBusinessService {
 
   @Override
   public List<Card> getCards() {
-    return asList(new Card(10, "4059102010101010", true, null),
+    return asList(
+        new Card(10, "4059102010101010", true, null),
         new Card(20, "4059102020202020", true, null));
   }
 

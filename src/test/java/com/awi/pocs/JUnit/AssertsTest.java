@@ -1,46 +1,54 @@
 package com.awi.pocs.JUnit;
 
 import com.awi.pocs.model.Card;
-import com.awi.pocs.model.Product;
 import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.isA;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class AssertsTest {
 
   private Asserts asserts = new Asserts();
 
   @Test
-  public void testHasActiveCardsWithProducts() {
+  public void testHasActiveCards() {
 
-    List<Card> cards = Arrays.asList(new Card(1001, "4557885801554491", true, null),
-        new Card(1002, "4557885801554492", true, Arrays.asList(new Product(11, "19315032768013005 "))),
-        new Card(1003, "4557885801554493", false, Arrays.asList(new Product(12, "19315032768013006 "))),
-        new Card(1004, "4557885801554494", false, Arrays.asList(new Product(15, "19315032768013007 "))));
+    List<Card> cards = Arrays.asList(
+        new Card(1001, "4557885801554491", true),
+        new Card(1002, "4557885801554492", true),
+        new Card(1003, "4557885801554493", false),
+        new Card(1004, "4557885801554494", false)
+    );
 
-    assertTrue(asserts.hasActiveCardsWithProducts().test(cards));
+    assertTrue(asserts.hasActiveCard().test(cards));
   }
 
   @Test
-  public void testHasNonActiveCardsWithProducts() {
+  public void testGetCardBin() {
 
-    List<Card> cards = Arrays.asList(new Card(1001, "4557885801554491", true, null),
-        new Card(1002, "4557885801554492", false, Arrays.asList(new Product(11, "19315032768013005"))),
-        new Card(1003, "4557885801554493", false, Arrays.asList(new Product(12, "19315032768013006"))),
-        new Card(1004, "4557885801554494", false, Arrays.asList(new Product(15, "19315032768013007"))));
+    Card card = new Card(1002, "4557885801554492", true);
 
-    assertFalse(asserts.hasActiveCardsWithProducts().test(cards));
+    assertEquals("455788", asserts.getCardBin().apply(card));
   }
 
   @Test
-  public void testGetCardSubBin() {
+  public void testCardsSizeHamcrest() {
 
-    Card card = new Card(1002, "4557885801554492", true, Arrays.asList(new Product(11, "19315032768013005 ")));
+    List<Card> cards = Arrays.asList(
+        new Card(1001, "4557885801554491", true),
+        new Card(1002, "4557885801554492", true),
+        new Card(1003, "4557885801554493", false),
+        new Card(1004, "4557885801554494", false)
+    );
 
-    assertEquals("58", asserts.getCardSubBin().apply(card));
+    assertEquals(4, cards.size());
+//    assertThat(cards, hasSize(4));
+//    assertThat(cards, isA(List.class));
   }
-
 }

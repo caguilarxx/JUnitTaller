@@ -12,15 +12,12 @@ import java.util.function.Predicate;
 @Component
 public class Asserts {
 
-  public Predicate<List<Card>> hasActiveCardsWithProducts() {
-
+  public Predicate<List<Card>> hasActiveCard() {
     return cards -> cards.stream()
-                .filter(card -> card.getProducts() != null && !card.getProducts().isEmpty())
-                .anyMatch(card -> card.getActive());
+        .anyMatch(Card::getActive);
   }
 
-  public Function<Card, String> getCardSubBin(){
-    return card -> card.getNumber().substring(6, 8);
+  public Function<Card, String> getCardBin() {
+    return card -> card.getNumber().substring(0, 6);
   }
-
 }
