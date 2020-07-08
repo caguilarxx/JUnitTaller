@@ -1,12 +1,9 @@
 package com.awi.pocs.model.api;
 
-import com.awi.pocs.model.Product;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-
-import java.util.List;
 
 @Getter
 @Setter

@@ -1,8 +1,8 @@
 package com.awi.pocs.JUnit;
 
-import static org.junit.Assert.assertEquals;
+import org.junit.jupiter.api.Test;
 
-import org.junit.Test;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class HelloWorldTest {
 
@@ -11,7 +11,7 @@ public class HelloWorldTest {
   @Test
   public void testHelloWorld() {
 
+    //expected - actual
     assertEquals("Hello World", helloWorld.saludo());
-
   }
 }
