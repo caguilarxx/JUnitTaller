@@ -7,8 +7,6 @@ import lombok.Setter;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
-import javax.persistence.Transient;
-import java.util.List;
 
 @Entity
 @Getter
@@ -23,14 +21,4 @@ public class Card {
   private String number;
 
   private Boolean active;
-
-  @Transient
-  private List<Product> products;
-
-
-  public Card(int id, String number, boolean active) {
-    this.id = id;
-    this.number = number;
-    this.active = active;
-  }
 }

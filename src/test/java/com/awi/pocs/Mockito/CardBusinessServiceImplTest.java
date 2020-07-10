@@ -8,7 +8,6 @@ import com.awi.pocs.model.Session;
 import com.awi.pocs.model.api.DemoRequest;
 import io.reactivex.Single;
 import io.reactivex.observers.TestObserver;
-import io.reactivex.schedulers.TestScheduler;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -16,10 +15,9 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.util.Arrays;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
+import static java.util.Arrays.asList;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.notNullValue;
@@ -35,9 +33,6 @@ public class CardBusinessServiceImplTest {
   private CardBusinessServiceImpl service;
 
   @Mock
-  private Session session;
-
-  @Mock
   private DemoRequest request;
 
   @Mock
@@ -50,10 +45,8 @@ public class CardBusinessServiceImplTest {
   public void testFilterActiveCardsAltWay() {
 
     /* Mock */
-    when(hazelcast.getFromCache(anyString())).thenReturn(session);
-    when(session.getDocumentNumber()).thenReturn("45614477");
-    when(session.isBlacklisted()).thenReturn(false);
-    when(request.getSessionId()).thenReturn("e156a4fc-ad78-461c-a627-535f3b9eaae7");
+    when(hazelcast.getFromCache(anyString())).thenReturn(new Session("e156a4fc", "45614477", false));
+    when(request.getSessionId()).thenReturn("e156a4fc");
     when(cardApi.getCards(any())).thenReturn(buildCardApiData());
 
     /* Test */
@@ -69,13 +62,11 @@ public class CardBusinessServiceImplTest {
 
 
   @Test
-  public void testTilterActiveCards() {
+  public void testFilterActiveCardsTestObs() {
 
     /* Mock */
-    when(hazelcast.getFromCache(anyString())).thenReturn(session);
-    when(session.getDocumentNumber()).thenReturn("45614477");
-    when(session.isBlacklisted()).thenReturn(false);
-    when(request.getSessionId()).thenReturn("e156a4fc-ad78-461c-a627-535f3b9eaae7");
+    when(hazelcast.getFromCache(anyString())).thenReturn(new Session("e156a4fc", "45614477", false));
+    when(request.getSessionId()).thenReturn("e156a4fc");
     when(cardApi.getCards(any())).thenReturn(buildCardApiData());
 
     /* Test */   //TODO merge?
@@ -95,8 +86,7 @@ public class CardBusinessServiceImplTest {
   public void testTilterActiveCardsException() {
 
     /* Mock */
-    when(session.isBlacklisted()).thenReturn(true);
-    when(hazelcast.getFromCache(any())).thenReturn(session);
+    when(hazelcast.getFromCache(any())).thenReturn(new Session("e156a4fc", "45614477", true));
 
     /* Test */   //TODO merge?
     TestObserver<List<Card>> testObserver = service.filterActiveCards(request).test();
@@ -113,8 +103,7 @@ public class CardBusinessServiceImplTest {
   public void testTilterActiveCardsObs() {
 
     /* Mock */
-    when(session.getDocumentNumber()).thenReturn("12345678");
-    when(hazelcast.getFromCache(any())).thenReturn(session);
+    when(hazelcast.getFromCache(any())).thenReturn(new Session("e156a4fc", "45614477", true));
     when(cardApi.getCards(any())).thenReturn(buildCardApiData());
 
     /* Test */
@@ -132,8 +121,9 @@ public class CardBusinessServiceImplTest {
         .assertNoErrors();
   }
 
+  /* CardAPI data return */
   private Single<List<Card>> buildCardApiData() {
-    return Single.just(Arrays.asList(
+    return Single.just(asList(
         new Card(1001, "4557885801554491", true),
         new Card(1002, "4557885801554492", true),
         new Card(1003, "4557885801554493", true),

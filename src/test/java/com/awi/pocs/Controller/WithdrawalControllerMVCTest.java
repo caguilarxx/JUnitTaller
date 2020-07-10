@@ -12,8 +12,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.RequestBuilder;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
-import java.util.Arrays;
-
+import static java.util.Arrays.asList;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -28,33 +27,36 @@ public class WithdrawalControllerMVCTest {
   private CardBusinessService service;
 
   @Test
-  public void getCardTest() throws Exception {
-
-    RequestBuilder requestBuilder = MockMvcRequestBuilders
-        .get("/withdrawal/card")
-        .accept(MediaType.APPLICATION_JSON);
-
-    mockMvc
-        .perform(requestBuilder)
-        .andExpect(status().isOk())
-        .andExpect(content().json("{id: 10, number: '4059102010101010', active: true, products: null}"))
-        .andReturn();
-  }
-
-  @Test
   public void getCardsTest() throws Exception {
 
-    when(service.getCards()).thenReturn(Arrays.asList(new Card(10, "4059102010101010", true, null),
-        new Card(20, "4059102020202020", true, null)));
+    /* Mock */
+    when(service.getCards()).thenReturn(asList(
+        new Card(10, "4059102010101010", true),
+        new Card(20, "4059102020202020", true)));
 
     RequestBuilder requestBuilder = MockMvcRequestBuilders
         .get("/withdrawal/cards")
         .accept(MediaType.APPLICATION_JSON);
 
+    /* Test & Asserts */
     mockMvc
         .perform(requestBuilder)
-        .andExpect(status().isOk())
+        .andExpect(status().is2xxSuccessful())
         .andExpect(content().json("[{ id: 10},{ id: 20}]", false))
+        .andReturn();
+  }
+
+  @Test
+  public void getCardsTestExc() throws Exception {
+
+    RequestBuilder requestBuilder = MockMvcRequestBuilders
+        .get("/withdrawal/cardsx")
+        .accept(MediaType.APPLICATION_JSON);
+
+    /* Test & Asserts */
+    mockMvc
+        .perform(requestBuilder)
+        .andExpect(status().isNotFound())
         .andReturn();
   }
 }

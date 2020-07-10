@@ -11,7 +11,7 @@ import lombok.Setter;
 @AllArgsConstructor
 public class Session {
 
-  private int id;
+  private String id;
   private String documentNumber;
   private boolean blacklisted;
 }

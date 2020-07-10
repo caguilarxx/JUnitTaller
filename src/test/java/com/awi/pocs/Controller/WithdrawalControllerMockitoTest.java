@@ -27,12 +27,15 @@ public class WithdrawalControllerMockitoTest {
   @Test
   public void getCardsTest() {
 
+    /* Mock */
     when(service.getCards()).thenReturn(asList(
-        new Card(10, "4059102010101010", true, null),
-        new Card(20, "4059102020202020", true, null)));
+        new Card(10, "4059102010101010", true),
+        new Card(20, "4059102020202020", true)));
 
+    /* Test */
     List<Card> cards = controller.getCards();
 
+    /* Asserts */
     assertEquals(2, cards.size());
   }
 }
