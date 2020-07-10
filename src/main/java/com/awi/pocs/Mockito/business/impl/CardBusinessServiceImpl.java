@@ -1,35 +1,30 @@
 package com.awi.pocs.Mockito.business.impl;
 
 import com.awi.pocs.Mockito.business.CardBusinessService;
-import com.awi.pocs.Mockito.repository.CardRepository;
 import com.awi.pocs.Mockito.service.CardApi;
 import com.awi.pocs.Mockito.service.HazelcastApi;
 import com.awi.pocs.model.Card;
-import com.awi.pocs.model.Product;
 import com.awi.pocs.model.Session;
 import com.awi.pocs.model.api.DemoRequest;
 import io.reactivex.Observable;
 import io.reactivex.Single;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import static io.reactivex.schedulers.Schedulers.io;
 import static java.util.Arrays.asList;
 import static java.util.stream.Collectors.toList;
 
 @Service
+@AllArgsConstructor
 public class CardBusinessServiceImpl implements CardBusinessService {
 
-  @Autowired
-  private CardApi cardApi;
-
-  @Autowired
-  private HazelcastApi hazelcast;
-
-  @Autowired
-  private CardRepository repository;
+  private final CardApi cardApi;
+  private final HazelcastApi hazelcast;
 
   @Override
   public List<Card> getCards() {
@@ -39,40 +34,43 @@ public class CardBusinessServiceImpl implements CardBusinessService {
   }
 
   @Override
-  public List<Card> getCardsFromDatabase() {
-    List<Card> cards = repository.findAll();
-    cards.forEach(card -> card.setProducts(asList(new Product(1,"11"))));
-    return cards;
-  }
-
-  @Override
   public Single<List<Card>> filterActiveCards(DemoRequest request) {
 
     Session session = hazelcast.getFromCache(request.getSessionId());
 
-    //Demo Exc
+    //Demo Exception
     if (session.isBlacklisted()) {
-      return Single.error(new RuntimeException("Person is Blacklisted"));
+      return Single.error(new Exception("Person is Blacklisted"));
     }
 
-    Single<List<Card>> cardsFromApi = cardApi.getCards(session.getDocumentNumber());
-
-    return cardsFromApi.map(cardApis -> cardApis.stream().filter(Card::getActive))
-        .map(cardApiStream -> cardApiStream.map(
-            cardApi -> new Card(cardApi.getId(), cardApi.getNumber(), cardApi.getActive(), null)).collect(toList()));
+    return cardApi.getCards(session.getDocumentNumber())
+        .map(cards -> cards.stream()
+            .filter(Card::getActive)
+            .collect(toList()));
   }
 
   @Override
   public Observable<Card> filterActiveCardsObs(DemoRequest request) {
-    Session session = hazelcast.getFromCache(request.getSessionId());
-    Single<List<Card>> cardsFromApi = cardApi.getCards(session.getDocumentNumber());
 
-    return cardsFromApi.map(cardApis -> cardApis.stream().filter(Card::getActive))
-        .map(cardApiStream -> cardApiStream.map(cardApi -> new Card(cardApi.getId(), cardApi.getNumber(), cardApi.getActive(), null))
+    Session session = hazelcast.getFromCache(request.getSessionId());
+
+    return cardApi.getCards(session.getDocumentNumber())
+        .map(cards -> cards.stream()
+            .filter(Card::getActive)
             .collect(toList()))
         .toObservable()
-        .flatMapIterable(x -> x)
+        .flatMapIterable(cards -> cards)
+        .concatMap(i-> Observable.just(i).delay(2, TimeUnit.SECONDS))
         .subscribeOn(io());
+  }
+
+  private Single<List<Card>> buildCardApiData() {
+    return Single.just(Arrays.asList(
+        new Card(1001, "4557885801554491", true),
+        new Card(1002, "4557885801554492", true),
+        new Card(1003, "4557885801554493", true),
+        new Card(1004, "4557885801554494", false)
+    ));
   }
 }
 

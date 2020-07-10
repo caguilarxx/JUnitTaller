@@ -14,8 +14,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 @Slf4j
 public class AnnotationsTest {
 
-  private Asserts asserts = new Asserts();
-
+  private CardsImpl cardsImpl = new CardsImpl();
   private List<Card> cards;
 
   @BeforeAll
@@ -48,7 +47,7 @@ public class AnnotationsTest {
   public void testHasActiveCard() {
 
     log.info("===> @Test testHasActiveCard");
-    assertTrue(asserts.hasActiveCard().test(cards));
+    assertTrue(cardsImpl.hasActiveCard().test(cards));
     cards = null;
   }
 
@@ -56,7 +55,7 @@ public class AnnotationsTest {
   public void testGetCardBin() {
 
     log.info("===> @Test testGetCardBin");
-    assertEquals("455788", asserts.getCardBin().apply(cards.get(0)));
+    assertEquals("455788", cardsImpl.getCardBin().apply(cards.get(0)));
   }
 
   @Test
@@ -64,6 +63,6 @@ public class AnnotationsTest {
   public void testGetCardBin2() {
 
     log.info("===> @Test testGetCardBin2");
-    assertEquals("455788", asserts.getCardBin().apply(cards.get(1)));
+    assertEquals("455788", cardsImpl.getCardBin().apply(cards.get(1)));
   }
 }

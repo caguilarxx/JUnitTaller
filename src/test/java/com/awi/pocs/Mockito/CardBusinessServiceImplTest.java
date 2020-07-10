@@ -8,22 +8,26 @@ import com.awi.pocs.model.Session;
 import com.awi.pocs.model.api.DemoRequest;
 import io.reactivex.Single;
 import io.reactivex.observers.TestObserver;
+import io.reactivex.schedulers.TestScheduler;
+import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
+@Slf4j
 @ExtendWith(MockitoExtension.class)
 public class CardBusinessServiceImplTest {
 
@@ -43,36 +47,46 @@ public class CardBusinessServiceImplTest {
   private CardApi cardApi;
 
   @Test
-  public void testTilterActiveCardsAltWay() {
+  public void testFilterActiveCardsAltWay() {
 
-    when(session.getDocumentNumber()).thenReturn("12345678");
+    /* Mock */
+    when(hazelcast.getFromCache(anyString())).thenReturn(session);
+    when(session.getDocumentNumber()).thenReturn("45614477");
     when(session.isBlacklisted()).thenReturn(false);
-    when(hazelcast.getFromCache(any())).thenReturn(session);
+    when(request.getSessionId()).thenReturn("e156a4fc-ad78-461c-a627-535f3b9eaae7");
     when(cardApi.getCards(any())).thenReturn(buildCardApiData());
 
-    List<Card> cardsTmp = new ArrayList<>();
+    /* Test */
+    List<Card> responseList = service.filterActiveCards(request).blockingGet();
 
-    service.filterActiveCards(request).subscribe(cards -> cardsTmp.addAll(cards));
+//    List<Card> responseList = new ArrayList<>();
+//    service.filterActiveCards(request).subscribe(cards -> responseList.addAll(cards));
 
-    assertThat(cardsTmp, hasSize(3));
-    assertThat(cardsTmp, notNullValue());
+    /* Asserts */
+    assertThat(responseList, hasSize(3));
+    assertThat(responseList, notNullValue());
   }
 
 
   @Test
   public void testTilterActiveCards() {
 
-    when(session.getDocumentNumber()).thenReturn("12345678");
+    /* Mock */
+    when(hazelcast.getFromCache(anyString())).thenReturn(session);
+    when(session.getDocumentNumber()).thenReturn("45614477");
     when(session.isBlacklisted()).thenReturn(false);
-    when(hazelcast.getFromCache(any())).thenReturn(session);
+    when(request.getSessionId()).thenReturn("e156a4fc-ad78-461c-a627-535f3b9eaae7");
     when(cardApi.getCards(any())).thenReturn(buildCardApiData());
 
-    TestObserver<List<Card>> testObserver = new TestObserver();
-    service.filterActiveCards(request).subscribe(testObserver);
-    testObserver.assertSubscribed()
+    /* Test */   //TODO merge?
+    TestObserver<List<Card>> testObserver = service.filterActiveCards(request).test();
+
+    /* Asserts */
+    testObserver
+        .assertSubscribed()
         .assertComplete()
+        .assertNever(cards -> cards.stream().anyMatch(card -> !card.getActive()))  // F
         .assertValue(cards -> cards.size() == 3)
-        .assertValue(cards -> cards.stream().noneMatch(card -> !card.getActive()))
         .assertValueCount(1)
         .assertNoErrors();
   }
@@ -80,36 +94,36 @@ public class CardBusinessServiceImplTest {
   @Test
   public void testTilterActiveCardsException() {
 
-//    when(session.getDocumentNumber()).thenReturn("12345678");
-//    when(cardsApi.getCards(any())).thenReturn(buildCardApiData());
-
-    when(session.isBlacklisted()).thenReturn(false);
+    /* Mock */
+    when(session.isBlacklisted()).thenReturn(true);
     when(hazelcast.getFromCache(any())).thenReturn(session);
 
-    when(session.isBlacklisted()).thenReturn(true);
+    /* Test */   //TODO merge?
+    TestObserver<List<Card>> testObserver = service.filterActiveCards(request).test();
 
-    service.filterActiveCards(request).test()
+    /* Asserts */
+    testObserver
         .assertSubscribed()
         .assertNotComplete()
         .assertValueCount(0)
-        .assertError(RuntimeException.class);
+        .assertError(Exception.class);
   }
 
   @Test
   public void testTilterActiveCardsObs() {
 
+    /* Mock */
     when(session.getDocumentNumber()).thenReturn("12345678");
-//    when(session.isBlacklisted()).thenReturn(false);
     when(hazelcast.getFromCache(any())).thenReturn(session);
     when(cardApi.getCards(any())).thenReturn(buildCardApiData());
 
-    TestObserver<Card> testObserver = new TestObserver();
+    /* Test */
+    TestObserver<Card> testObserver = service.filterActiveCardsObs(request).test();
 
-    service.filterActiveCardsObs(request).subscribe(testObserver);
-
-    //Observable Async
+    /* blocking io*/
     testObserver.awaitTerminalEvent();
 
+    /* Asserts */
     testObserver
         .assertSubscribed()
         .assertComplete()

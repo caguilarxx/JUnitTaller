@@ -11,8 +11,6 @@ public interface CardBusinessService {
 
   List<Card> getCards();
 
-  List<Card> getCardsFromDatabase();
-
   Single<List<Card>> filterActiveCards(DemoRequest request);
 
   Observable<Card> filterActiveCardsObs(DemoRequest request);

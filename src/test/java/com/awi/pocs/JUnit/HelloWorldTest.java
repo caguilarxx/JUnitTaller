@@ -11,7 +11,10 @@ public class HelloWorldTest {
   @Test
   public void testHelloWorld() {
 
-    //expected - actual
-    assertEquals("Hello World", helloWorld.saludo());
+    /* Test */
+    String resultado = helloWorld.saludo();
+
+    /* Assert */
+    assertEquals("Hello World", resultado);
   }
 }

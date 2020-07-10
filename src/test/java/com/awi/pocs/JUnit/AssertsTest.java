@@ -14,11 +14,12 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class AssertsTest {
 
-  private Asserts asserts = new Asserts();
+  private CardsImpl cardsImpl = new CardsImpl();
 
   @Test
   public void testHasActiveCards() {
 
+    /* Data */
     List<Card> cards = Arrays.asList(
         new Card(1001, "4557885801554491", true),
         new Card(1002, "4557885801554492", true),
@@ -26,20 +27,30 @@ public class AssertsTest {
         new Card(1004, "4557885801554494", false)
     );
 
-    assertTrue(asserts.hasActiveCard().test(cards));
+    /* Test */
+    boolean resultado = cardsImpl.hasActiveCard().test(cards);
+
+    /* Assert */
+    assertTrue(resultado);
   }
 
   @Test
   public void testGetCardBin() {
 
+    /* Data */
     Card card = new Card(1002, "4557885801554492", true);
 
-    assertEquals("455788", asserts.getCardBin().apply(card));
+    /* Test */
+    String resultado = cardsImpl.getCardBin().apply(card);
+
+    /* Assert */
+    assertEquals("455788", resultado);
   }
 
   @Test
   public void testCardsSizeHamcrest() {
 
+    /* Data */
     List<Card> cards = Arrays.asList(
         new Card(1001, "4557885801554491", true),
         new Card(1002, "4557885801554492", true),
@@ -47,8 +58,8 @@ public class AssertsTest {
         new Card(1004, "4557885801554494", false)
     );
 
-    assertEquals(4, cards.size());
-//    assertThat(cards, hasSize(4));
-//    assertThat(cards, isA(List.class));
+    /* Assert */
+    assertThat(cards, hasSize(4));
+    assertThat(cards, isA(List.class));
   }
 }
