@@ -14,7 +14,6 @@ import java.util.List;
 
 @RestController
 @AllArgsConstructor
-@RequestMapping("/withdrawal")
 public class WithdrawalController {
 
   private final CardBusinessService service;

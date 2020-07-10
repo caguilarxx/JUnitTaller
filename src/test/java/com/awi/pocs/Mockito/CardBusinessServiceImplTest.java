@@ -104,12 +104,12 @@ public class CardBusinessServiceImplTest {
 
     /* Mock */
     when(hazelcast.getFromCache(any())).thenReturn(new Session("e156a4fc", "45614477", true));
-    when(cardApi.getCards(any())).thenReturn(buildCardApiData());
+//    when(cardApi.getCards(any())).thenReturn(buildCardApiData());
 
     /* Test */
     TestObserver<Card> testObserver = service.filterActiveCardsObs(request).test();
 
-    /* blocking io*/
+    /* blocking async io !! */
     testObserver.awaitTerminalEvent();
 
     /* Asserts */

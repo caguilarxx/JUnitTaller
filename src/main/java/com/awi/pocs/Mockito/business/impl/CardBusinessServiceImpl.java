@@ -54,13 +54,13 @@ public class CardBusinessServiceImpl implements CardBusinessService {
 
     Session session = hazelcast.getFromCache(request.getSessionId());
 
-    return cardApi.getCards(session.getDocumentNumber())
+    return buildCardApiData()
         .map(cards -> cards.stream()
             .filter(Card::getActive)
             .collect(toList()))
         .toObservable()
         .flatMapIterable(cards -> cards)
-        .concatMap(i-> Observable.just(i).delay(2, TimeUnit.SECONDS))
+        .concatMap(i-> Observable.just(i).delay(4, TimeUnit.SECONDS))
         .subscribeOn(io());
   }
 
