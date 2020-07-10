@@ -35,7 +35,7 @@ public class WithdrawalControllerMVCTest {
         new Card(20, "4059102020202020", true)));
 
     RequestBuilder requestBuilder = MockMvcRequestBuilders
-        .get("/withdrawal/cards")
+        .get("/cards")
         .accept(MediaType.APPLICATION_JSON);
 
     /* Test & Asserts */
@@ -50,7 +50,7 @@ public class WithdrawalControllerMVCTest {
   public void getCardsTestExc() throws Exception {
 
     RequestBuilder requestBuilder = MockMvcRequestBuilders
-        .get("/withdrawal/cardsx")
+        .get("/cardsx")
         .accept(MediaType.APPLICATION_JSON);
 
     /* Test & Asserts */
